@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Types {
+  FILE
+  AUDIO
+  TEXT
+}
+
+model User {
+  id           Int      @default(autoincrement()) @id
+  email        String   @unique
+  name         String?
+  messages     Message[]
+  createdAt    DateTime @default(now())
+  Chat Chat[]
+}
+
+model Chat {
+  id           Int      @default(autoincrement()) @id
+  name         String?
+  messages     Message[]
+  createdAt    DateTime @default(now())
+  editedAt     DateTime @default(now())
+  User User[]
+}
+
+model Message {
+  id        Int      @default(autoincrement()) @id
+  content   String?
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  Int?
+  chat      Chat?    @relation(fields: [chatId], references: [id])
+  chatId    Int?
+  type      Types
+  createdAt DateTime @default(now())
+  editedAt  DateTime @default(now())
+}

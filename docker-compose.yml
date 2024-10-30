@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: 4kchat
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  beckend:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: './beckend'
+    depends_on:
+      - postgres
+    volumes:
+      - type: bind
+        source: ./beckend
+        target: /app
+    ports:
+      - '3000:3000'
+
+  frontend:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: './frontend'
+    depends_on:
+      - api
+    volumes:
+      - type: bind
+        source: ./frontend
+        target: /app
+    ports:
+      - '3001:5173'
+
+volumes:
+  pgdata:
